@@ -42,6 +42,7 @@ def process_data(df, start_hour, end_hour, start_date, end_date):
 
 # Initialize the Dash app
 app = dash.Dash(__name__)
+server = app.server
 
 # Define the layout of the Dash app
 app.layout = html.Div([
