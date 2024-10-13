@@ -11,8 +11,8 @@ import io
 # Define the data processing function from the uploaded file
 def process_data(df, start_hour, end_hour, start_date, end_date):
     df.columns = [c.strip() for c in df.columns]
-    df['Start'] = pd.to_datetime(df['Start'])
-    df['End'] = pd.to_datetime(df['End'])
+    df['Start'] = pd.to_datetime(df['Start'],format='ISO8601')
+    df['End'] = pd.to_datetime(df['End'],format='ISO8601')
     df['date'] = df['Start'].dt.date
     df['hour'] = df['Start'].dt.hour
     df = df[df['date'].between(datetime.strptime(start_date, '%Y-%m-%d').date(),
