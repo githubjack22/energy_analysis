@@ -42,12 +42,26 @@ def process_data(df, start_hour, end_hour, start_date, end_date):
 
 # Initialize the Dash app
 app = dash.Dash(__name__)
-server = app.server
 
 # Define the layout of the Dash app
 app.layout = html.Div([
     html.H1("Energy Consumption and Cost Analysis", style={'textAlign': 'center', 'color': '#b2f0fd'}),
-
+    #add description
+    html.Div(
+    children=[
+        html.P(
+            [""" Paying high energy bills when you don't even use any energy actively? 
+                This page offers you an opportunity to understand your energy usage better. """,
+            html.Br(),
+            """How does this work? Simply Provide your octopus half-hourly energy consumption data, 
+            and type in the period of interest.""", 
+            """Tell us the time period when you don't actively use any energy and we'll sort out the rest. """
+            ]
+        )
+    ],
+    style={'textAlign': 'justify', 'color': 'white', 'fontSize': 18, 'margin': '0 auto',
+           'width': '60%', 'whiteSpace': 'normal', 'wordWrap': 'break-word'}
+    ),
     # File upload component
     dcc.Upload(
         id='upload-data',
@@ -60,28 +74,52 @@ app.layout = html.Div([
         multiple=False
     ),
 
+
     # User input for start and end date
     html.Div([
-        dcc.Input(id='start-date', type='text', placeholder='Start Date (YYYY-MM-DD)'),
-        dcc.Input(id='end-date', type='text', placeholder='End Date (YYYY-MM-DD)'),
-    ], style={'textAlign': 'center', 'margin': '10px'}),
+    # Text before input
+        html.P("Select the date range of analysis:",
+            style={'textAlign': 'left', 'color': 'white', 'marginRight': '10px',
+                    'display': 'inline-block', 'width': '200px'}),
 
-    # User input for start and end hour
+        # Input for start date
+        dcc.Input(id='start-date', type='text', placeholder='Start Date (YYYY-MM-DD)',
+                style={'display': 'inline-block', 'width': '150px'}),
+
+        # Input for end date
+        dcc.Input(id='end-date', type='text', placeholder='End Date (YYYY-MM-DD)',
+                style={'display': 'inline-block', 'width': '150px'}),
+        ], style={'textAlign': 'left', 'margin': '10px','paddingLeft': '400px'}),
+
+# User input for start and end hour
     html.Div([
-        dcc.Input(id='start-hour', type='number', placeholder='Start Hour (0-23)'),
-        dcc.Input(id='end-hour', type='number', placeholder='End Hour (0-23)'),
-    ], style={'textAlign': 'center', 'margin': '10px'}),
+        html.P("Select your inactive time:",
+            style={'textAlign': 'left', 'color': 'white', 'marginRight': '10px',
+                    'display': 'inline-block', 'width': '200px'}),
+
+        dcc.Input(id='start-hour', type='number', placeholder='Start Hour (0-23)',
+                style={'display': 'inline-block', 'width': '150px'}),
+
+        dcc.Input(id='end-hour', type='number', placeholder='End Hour (0-23)',
+                style={'display': 'inline-block', 'width': '150px'}),
+        ], style={'textAlign': 'left', 'margin': '10px','width': '50%','paddingLeft': '400px'}),
 
     # Dropdown to select between 'Daily Consumption' and 'Daily Cost'
-    dcc.Dropdown(
-        id='dropdown-selection',
-        options=[
-            {'label': 'Daily Consumption', 'value': 'consumption'},
-            {'label': 'Daily Cost', 'value': 'cost'}
-        ],
-        value='consumption',  # Default value
-        style={'width': '50%', 'margin': '0 auto'}
-    ),
+    html.Div([
+        html.P("Select analysis type:",
+            style={'textAlign': 'left', 'color': 'white', 'marginRight': '10px',
+                    'display': 'inline-block', 'width': '200px'}),
+
+        dcc.Dropdown(
+            id='dropdown-selection',
+            options=[
+                {'label': 'Daily Consumption', 'value': 'consumption'},
+                {'label': 'Daily Cost', 'value': 'cost'}
+            ],
+            placeholder="Select analysis type",
+            style={'display': 'inline-block', 'width': '150px'}
+        )
+        ], style={'textAlign': 'left', 'margin': '10px','width': '50%','paddingLeft': '400px'}),
 
     # Graph to display the visualizations
     dcc.Graph(id='graph-output')
@@ -106,6 +144,17 @@ def parse_contents(contents, filename):
         return None
     
     return df
+
+# Define callback to update the file status
+@app.callback(
+    Output('upload-data', 'children'),
+    Input('upload-data', 'filename')
+)
+
+def update_upload_area(filename):
+    if filename is not None:
+        return html.Div(f"Uploaded File: {filename}", style={'color': '#b2f0fd'})
+    return html.Div(['Drag and Drop or ', html.A('Select a File')])
 
 # Define callback to update the graph based on file upload and user input
 @app.callback(
