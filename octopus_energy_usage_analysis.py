@@ -8,6 +8,24 @@ from datetime import datetime
 import base64
 import io
 
+
+# Function to parse uploaded file content
+def parse_contents(contents, filename):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    
+    try:
+        if 'csv' in filename:
+            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+        elif 'xls' in filename:
+            df = pd.read_excel(io.BytesIO(decoded))
+        else:
+            return None
+    except Exception as e:
+        print(e)
+        return None
+    
+    return df
 # Define the data processing function from the uploaded file
 def process_data(df, start_hour, end_hour, start_date, end_date):
     df.columns = [c.strip() for c in df.columns]
@@ -128,23 +146,7 @@ app.layout = html.Div([
 style={'backgroundColor': '#260e3d', 'padding': '20px',
     'height': '100vh','width': '100vw','boxSizing': 'border-box'})
 
-# Function to parse uploaded file content
-def parse_contents(contents, filename):
-    content_type, content_string = contents.split(',')
-    decoded = base64.b64decode(content_string)
-    
-    try:
-        if 'csv' in filename:
-            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
-        elif 'xls' in filename:
-            df = pd.read_excel(io.BytesIO(decoded))
-        else:
-            return None
-    except Exception as e:
-        print(e)
-        return None
-    
-    return df
+
 
 # Define callback to update the file status
 @app.callback(
