@@ -72,7 +72,7 @@ app.layout = html.Div([
             [""" Paying high energy bills when you don't even use any energy actively? 
                 This page offers you an opportunity to understand your energy usage better. """,
             html.Br(),
-            """How does this work? Simply Provide your octopus half-hourly energy consumption data, 
+            """How does this work? Simply provide your octopus half-hourly energy consumption data, 
             and type in the period of interest.""", 
             """Tell us the time period when you don't actively use any energy and we'll sort out the rest. """
             ]
